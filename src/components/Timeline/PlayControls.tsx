@@ -12,7 +12,7 @@ export const PlayControls = ({ time, setTime }: PlayControlsProps) => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setTime(Number(e.target.value));
     },
-    [setTime],
+    [setTime]
   );
 
   return (
