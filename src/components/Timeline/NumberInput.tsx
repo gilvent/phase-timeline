@@ -41,7 +41,6 @@ export const NumberInput = ({
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    e.preventDefault();
     if (isChangedByStepButton(e)) {
       // FIXME: When using native step button / native arrow up and down key handler
       //  -> Enter -> Click on the input field -> Does not reselect the field
@@ -77,7 +76,7 @@ export const NumberInput = ({
       finalValue = roundToNearestPrecision(finalValue, STEP);
     }
 
-    setCurrentValue(Number(finalValue).toString());
+    setCurrentValue(finalValue.toString());
     onChange(finalValue);
   }
 
