@@ -4,9 +4,16 @@ import { NumberInput } from "./NumberInput";
 type PlayControlsProps = {
   time: number;
   setTime: (time: number) => void;
+  duration: number;
+  setDuration: (duration: number) => void;
 };
 
-export const PlayControls = ({ time, setTime }: PlayControlsProps) => {
+export const PlayControls = ({
+  time,
+  setTime,
+  duration,
+  setDuration
+}: PlayControlsProps) => {
   // TODO: implement time <= maxTime
 
   const onTimeChange = useCallback(
@@ -14,6 +21,16 @@ export const PlayControls = ({ time, setTime }: PlayControlsProps) => {
       setTime(val);
     },
     [setTime]
+  );
+
+  const onDurationChange = useCallback(
+    (val: number) => {
+      if (val < time) {
+        setTime(val);
+      }
+      setDuration(val);
+    },
+    [setTime, setDuration, time]
   );
 
   return (
@@ -29,19 +46,17 @@ export const PlayControls = ({ time, setTime }: PlayControlsProps) => {
           onChange={onTimeChange}
           dataTestId="time"
           min={0}
-          max={2000}
+          max={duration}
         />
       </fieldset>
       -
       <fieldset className="flex gap-1">
-        <input
-          className="bg-gray-700 px-1 rounded"
-          type="number"
-          data-testid="max-time"
-          min={100}
-          max={2000}
-          step={10}
-          defaultValue={2000}
+        <NumberInput
+          value={duration}
+          dataTestId="max-time"
+          min={0}
+          max={6000}
+          onChange={onDurationChange}
         />
         Duration
       </fieldset>

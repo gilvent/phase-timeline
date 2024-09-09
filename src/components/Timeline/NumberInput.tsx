@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { roundToNearestPrecision } from "../../utils/math";
 import classNames from "classnames";
 
@@ -31,6 +31,10 @@ export const NumberInput = ({
     Enter: handleEnterKey,
     Escape: handleEscapeKey
   };
+
+  useEffect(() => {
+    setCurrentValue(originalValue.toString());
+  }, [originalValue]);
 
   function handleFocus() {
     selectAllInputText();
