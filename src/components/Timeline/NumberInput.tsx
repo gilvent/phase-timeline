@@ -23,9 +23,8 @@ export const NumberInput = ({
   const [currentValue, setCurrentValue] = useState<string>(
     originalValue.toString() ?? 0
   );
-  const [isFocused, setIsFocused] = useState<boolean>(false);
   const elementRef = useRef<HTMLInputElement | null>(null);
-  const keyboardActions: Record<
+  const specialKeyActions: Record<
     string,
     (e: React.KeyboardEvent<HTMLInputElement>) => void
   > = {
@@ -34,12 +33,10 @@ export const NumberInput = ({
   };
 
   function handleFocus() {
-    setIsFocused(true);
     selectAllInputText();
   }
 
   function handleBlur() {
-    setIsFocused(false);
     applyValue(currentValue);
   }
 
@@ -85,9 +82,7 @@ export const NumberInput = ({
   }
 
   function handleSpecialKey(e: React.KeyboardEvent<HTMLInputElement>) {
-    if (!isFocused) return;
-
-    keyboardActions[e.key]?.(e);
+    specialKeyActions[e.key]?.(e);
   }
 
   function handleEnterKey(e: React.KeyboardEvent<HTMLInputElement>) {
