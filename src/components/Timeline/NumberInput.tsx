@@ -23,28 +23,12 @@ export const NumberInput = ({
     originalValue.toString() ?? 0
   );
   const elementRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    elementRef.current?.addEventListener("focusin", onFocusIn);
-
-    return () => {
-      elementRef.current?.removeEventListener("focusin", onFocusIn);
-    };
-  });
-
-  useEffect(() => {
-    elementRef.current?.addEventListener("focusout", onFocusOut);
-
-    return () => {
-      elementRef.current?.removeEventListener("focusout", onFocusOut);
-    };
-  });
-
-  function onFocusIn() {
+  function handleFocus() {
+    setIsFocused(true);
     selectAllInputText();
   }
 
-  function onFocusOut() {
+  function handleBlur() {
     applyValue(currentValue);
   }
 
@@ -93,6 +77,8 @@ export const NumberInput = ({
       step={STEP}
       value={currentValue}
       onChange={handleChange}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     />
   );
 };
