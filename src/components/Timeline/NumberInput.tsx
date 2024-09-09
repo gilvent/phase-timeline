@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
-// import usePreviousState from "../../hooks/usePreviousState.hook";
+import React, { useRef, useState } from "react";
+import { roundToNearestPrecision } from "../../utils/math";
 
 type NumberInputProps = {
   value: number;
@@ -22,7 +22,16 @@ export const NumberInput = ({
   const [currentValue, setCurrentValue] = useState<string>(
     originalValue.toString() ?? 0
   );
+  const [isFocused, setIsFocused] = useState<boolean>(false);
   const elementRef = useRef<HTMLInputElement | null>(null);
+  const keyboardActions: Record<
+    string,
+    (e: React.KeyboardEvent<HTMLInputElement>) => void
+  > = {
+    Enter: handleEnterKey,
+    Escape: handleEscapeKey
+  };
+
   function handleFocus() {
     setIsFocused(true);
     selectAllInputText();
@@ -33,17 +42,21 @@ export const NumberInput = ({
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    e.preventDefault();
     if (isChangedByStepButton(e)) {
+      // FIXME: When using step button -> Enter -> Click on the input field does not reselect the field
       selectAllInputText();
       applyValue(e.target.value);
       return;
     }
 
-    // TODO: implement key handler
     setCurrentValue(e.target.value);
   }
 
-  function isChangedByStepButton(e: React.ChangeEvent<HTMLInputElement>) {
+  // FIXME: This approach still return false when current value is not multiple of steps (e.g 123)
+  function isChangedByStepButton(
+    e: React.ChangeEvent<HTMLInputElement>
+  ): boolean {
     return Math.abs(parseInt(currentValue) - parseInt(e.target.value)) === STEP;
   }
 
@@ -55,15 +68,34 @@ export const NumberInput = ({
     let finalValue: number = parseInt(value);
 
     if (!value) {
+      // TODO: implement previous valid value instead of original value
       finalValue = originalValue;
     } else if (finalValue < 0) {
       finalValue = min;
     } else {
-      finalValue = Math.round(finalValue);
+      finalValue = roundToNearestPrecision(finalValue, STEP);
     }
 
     setCurrentValue(Number(finalValue).toString());
     onChange(finalValue);
+  }
+
+  function handleSpecialKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!isFocused) return;
+
+    keyboardActions[e.key]?.(e);
+  }
+
+  function handleEnterKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    e.preventDefault();
+    elementRef.current?.blur();
+    applyValue(currentValue);
+  }
+
+  function handleEscapeKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    e.preventDefault();
+    elementRef.current?.blur();
+    applyValue(originalValue.toString() ?? 0);
   }
 
   return (
@@ -79,6 +111,7 @@ export const NumberInput = ({
       onChange={handleChange}
       onFocus={handleFocus}
       onBlur={handleBlur}
+      onKeyDown={handleSpecialKey}
     />
   );
 };
