@@ -1,5 +1,6 @@
 import React, { useRef, useState } from "react";
 import { roundToNearestPrecision } from "../../utils/math";
+import classNames from "classnames";
 
 type NumberInputProps = {
   value: number;
@@ -38,13 +39,15 @@ export const NumberInput = ({
   }
 
   function handleBlur() {
+    setIsFocused(false);
     applyValue(currentValue);
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     e.preventDefault();
     if (isChangedByStepButton(e)) {
-      // FIXME: When using step button -> Enter -> Click on the input field does not reselect the field
+      // FIXME: When using native step button / native arrow up and down key handler
+      //  -> Enter -> Click on the input field -> Does not reselect the field
       selectAllInputText();
       applyValue(e.target.value);
       return;
@@ -68,10 +71,11 @@ export const NumberInput = ({
     let finalValue: number = parseInt(value);
 
     if (!value) {
-      // TODO: implement previous valid value instead of original value
       finalValue = originalValue;
-    } else if (finalValue < 0) {
+    } else if (finalValue < min) {
       finalValue = min;
+    } else if (finalValue > max) {
+      finalValue = max;
     } else {
       finalValue = roundToNearestPrecision(finalValue, STEP);
     }
@@ -98,10 +102,20 @@ export const NumberInput = ({
     applyValue(originalValue.toString() ?? 0);
   }
 
+  function isValidInput() {
+    if (currentValue.length > 1 && currentValue.charAt(0) === "0") return false;
+    if (currentValue.match(/[^0-9]/)) return false;
+
+    const value = parseInt(currentValue);
+    return value <= max && value >= min;
+  }
+
   return (
     <input
       ref={elementRef}
-      className="bg-gray-700 px-1 rounded"
+      className={classNames("bg-gray-700", "px-1", "rounded", {
+        "text-rose-500": !isValidInput()
+      })}
       type="number"
       data-testid={dataTestId}
       min={min}
