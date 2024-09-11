@@ -5,7 +5,6 @@ import { TrackList } from "./TrackList";
 import { KeyframeList } from "./KeyframeList";
 import { PlayControls } from "./PlayControls";
 import { roundToNearestPrecision } from "../../utils/math";
-// import { roundToNearestPrecision } from "../../utils/math";
 
 export const Timeline = () => {
   // FIXME: performance concerned
@@ -15,33 +14,10 @@ export const Timeline = () => {
 
   function handlePlayControlTimeChange(time: number) {
     setTime(time);
-    setPlayheadX(time);
   }
 
-  function handleRulerDragging({
-    time,
-    playheadX
-  }: {
-    time: number;
-    playheadX: number;
-  }) {
+  function handleRulerTimeUpdate(time: number) {
     setTime(roundToNearestPrecision(time, 10));
-    setPlayheadX(playheadX);
-  }
-
-  function handleRulerMouseDown({
-    time,
-    playheadX
-  }: {
-    time: number;
-    playheadX: number;
-  }) {
-    setTime(roundToNearestPrecision(time, 10));
-    setPlayheadX(playheadX);
-  }
-
-  function handleRulerScroll({ playheadX }: { playheadX: number }) {
-    setPlayheadX(playheadX);
   }
 
   return (
@@ -58,10 +34,9 @@ export const Timeline = () => {
       />
       <Ruler
         width={duration}
-        onMouseDown={handleRulerMouseDown}
-        onDragging={handleRulerDragging}
-        onScroll={handleRulerScroll}
         time={time}
+        timeUpdate={handleRulerTimeUpdate}
+        playheadUpdate={setPlayheadX}
       />
       <TrackList />
       <KeyframeList />

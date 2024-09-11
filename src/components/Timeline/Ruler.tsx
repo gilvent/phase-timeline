@@ -3,46 +3,34 @@ import useScrollSync, { ScrollSyncID } from "../../hooks/useScrollSync";
 
 type RulerProps = {
   width: number;
-  onMouseDown: ({
-    time,
-    playheadX
-  }: {
-    time: number;
-    playheadX: number;
-  }) => void;
-  onDragging: ({
-    time,
-    playheadX
-  }: {
-    time: number;
-    playheadX: number;
-  }) => void;
   time: number;
-  onScroll: ({
-    playheadX,
-    shouldHidePlayhead
-  }: {
-    playheadX: number;
-    shouldHidePlayhead: boolean;
-  }) => void;
+  timeUpdate: (time: number) => void;
+  playheadUpdate: (xPos: number) => void;
 };
 
 export const Ruler = ({
   width,
-  onMouseDown,
-  onDragging,
-  onScroll,
-  time
+  time,
+  timeUpdate,
+  playheadUpdate
 }: RulerProps) => {
   // TODO: implement mousedown and mousemove to update time and Playhead position
   const nodeRef = useRef<HTMLDivElement | null>(null);
+  const draggableAreaRef = useRef<HTMLDivElement | null>(null);
   const timePosition = useRef<number>(time);
   const isDraggable = useRef<boolean>(false);
-  const boundary = useRef({
-    left: 0,
-    right: 0
-  });
-  const scroll = useScrollSync({
+  const scrollLeft = useRef<number>(0);
+  const draggableAreaLeft = useRef<number>(0);
+
+  // TODO: implement bounds to prevent playhead moving out of bounds
+  // const bounds = useRef({
+  //   left: 0,
+  //   right: 0,
+  //   top: 0,
+  //   bottom: 0
+  // });
+
+  useScrollSync({
     id: ScrollSyncID.Ruler,
     syncTargetId: ScrollSyncID.Keyframe,
     nodeRef
@@ -56,43 +44,65 @@ export const Ruler = ({
     };
   }, []);
 
+  useEffect(() => {
+    timePosition.current = time;
+    if (!isDraggable.current) {
+      playheadUpdate(timePosition.current - scrollLeft.current);
+    }
+  }, [time]);
+
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      const element = e.target as Element;
-      const elementRect = element.getBoundingClientRect();
-      const scrollLeft = scroll.current?.left ?? 0;
+      const draggableArea = e.target as Element;
+      const draggableAreaRect = draggableArea.getBoundingClientRect();
+
+      // TODO: init bounds
+      // const outerAreaRect = nodeRef.current?.getBoundingClientRect();
+      // bounds.current = {
+      //   left:
+      //     draggableAreaRect.left >= outerRect.left
+      //       ? draggableAreaRect.left
+      //       : outerRect.left,
+      //   right:
+      //     draggableAreaRect.right <= outerRect.right
+      //       ? draggableAreaRect.right
+      //       : outerRect.right,
+      //   top: draggableAreaRect.top,
+      //   bottom: draggableAreaRect.bottom
+      // };
 
       isDraggable.current = true;
-      boundary.current = {
-        left: elementRect.left + scrollLeft,
-        right: elementRect.right + scrollLeft
-      };
-      timePosition.current = e.clientX - boundary.current.left + scrollLeft;
+      timePosition.current = e.clientX - draggableAreaRect.left;
+      draggableAreaLeft.current = draggableAreaRect.left;
 
-      onMouseDown({
-        time: timePosition.current,
-        playheadX: timePosition.current - scrollLeft
-      });
+      timeUpdate(timePosition.current);
+      playheadUpdate(timePosition.current - scrollLeft.current);
+
       enableDragging();
     },
-    [onMouseDown]
+    [timeUpdate, playheadUpdate]
   );
 
-  function handleDragging(e: MouseEvent) {
-    if (!isDraggable.current) {
-      return;
-    }
+  const handleDragging = useCallback(
+    (e: MouseEvent) => {
+      if (!isDraggable.current) {
+        return;
+      }
 
-    const scrollLeft = scroll.current?.left ?? 0;
+      // TODO handle playhead out of boundary
 
-    // TODO handle playhead out of boundary
+      timePosition.current = e.clientX - draggableAreaLeft.current;
 
-    timePosition.current = e.clientX - boundary.current.left + scrollLeft;
+      timeUpdate(timePosition.current);
+      playheadUpdate(timePosition.current - scrollLeft.current);
+    },
+    [timeUpdate, playheadUpdate]
+  );
 
-    onDragging({
-      time: timePosition.current,
-      playheadX: timePosition.current - scrollLeft
-    });
+  function enableDragging() {
+    window.addEventListener("mousemove", handleDragging);
+    window.addEventListener("mouseup", endDragging);
+    window.addEventListener("selectstart", disableSelect);
   }
 
   function endDragging() {
@@ -102,24 +112,15 @@ export const Ruler = ({
     window.removeEventListener("selectstart", disableSelect);
   }
 
-  function enableDragging() {
-    window.addEventListener("mousemove", handleDragging);
-    window.addEventListener("mouseup", endDragging);
-    window.addEventListener("selectstart", disableSelect);
-  }
-
   function disableSelect(e: Event) {
     e.preventDefault();
   }
 
   function handleScrollChange(e: Event) {
     const el = e.target as HTMLDivElement;
-    const playheadX = timePosition.current + -1 * el.scrollLeft;
+    scrollLeft.current = el.scrollLeft;
 
-    onScroll({
-      playheadX,
-      shouldHidePlayhead: playheadX < 0
-    });
+    playheadUpdate(timePosition.current - scrollLeft.current);
   }
 
   return (
@@ -131,6 +132,7 @@ export const Ruler = ({
       data-testid="ruler"
     >
       <div
+        ref={draggableAreaRef}
         className="w-[2000px] h-6 rounded-md bg-white/25"
         onMouseDown={handleMouseDown}
         style={{ width }}
