@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react";
+import useScrollSync, { ScrollSyncID } from "../../hooks/useScrollSync";
 
 type RulerProps = {
   width: number;
@@ -14,22 +15,18 @@ export const Ruler = ({
   onDraggingEnd
 }: RulerProps) => {
   // TODO: implement mousedown and mousemove to update time and Playhead position
-  const rulerRef = useRef(null);
+  const nodeRef = useRef<HTMLDivElement | null>(null);
   const isDraggable = useRef<boolean>(false);
   const boundary = useRef({
     left: 0,
     right: 0
   });
 
-  // useEffect(() => {
-  //   window.addEventListener("mouseup", endDragging);
-  //   window.addEventListener("mousemove", handleDragging);
-
-  //   return () => {
-  //     window.removeEventListener("mouseup", endDragging);
-  //     window.removeEventListener("mousemove", handleDragging);
-  //   };
-  // }, []);
+  useScrollSync({
+    id: ScrollSyncID.Ruler,
+    syncTargetId: ScrollSyncID.Keyframe,
+    nodeRef
+  });
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -74,22 +71,28 @@ export const Ruler = ({
 
     window.removeEventListener("mousemove", handleDragging);
     window.removeEventListener("mouseup", endDragging);
+    window.removeEventListener("selectstart", disableSelect);
   }
 
   function enableDragging() {
     window.addEventListener("mousemove", handleDragging);
     window.addEventListener("mouseup", endDragging);
+    window.addEventListener("selectstart", disableSelect);
+  }
+
+  function disableSelect(e: Event) {
+    e.preventDefault();
   }
 
   return (
     <div
+      ref={nodeRef}
       className="px-4 py-2 min-w-0 
       border-b border-solid border-gray-700 
       overflow-x-auto overflow-y-hidden"
       data-testid="ruler"
     >
       <div
-        ref={rulerRef}
         className="w-[2000px] h-6 rounded-md bg-white/25"
         onMouseDown={handleMouseDown}
         style={{ width }}
