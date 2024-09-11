@@ -11,6 +11,7 @@ export const Timeline = () => {
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(2000);
   const [playheadX, setPlayheadX] = useState(time);
+  const [playheadHidden, setPlayheadHidden] = useState(false);
 
   function handlePlayControlTimeChange(time: number) {
     setTime(time);
@@ -18,6 +19,14 @@ export const Timeline = () => {
 
   function handleRulerTimeUpdate(time: number) {
     setTime(roundToNearestPrecision(time, 10));
+  }
+
+  function handleRulerPlayheadUpdate(
+    xPosition: number,
+    isOutOfBounds: boolean
+  ) {
+    setPlayheadHidden(isOutOfBounds);
+    setPlayheadX(xPosition);
   }
 
   return (
@@ -36,11 +45,11 @@ export const Timeline = () => {
         width={duration}
         time={time}
         timeUpdate={handleRulerTimeUpdate}
-        playheadUpdate={setPlayheadX}
+        playheadUpdate={handleRulerPlayheadUpdate}
       />
       <TrackList />
       <KeyframeList />
-      <Playhead position={playheadX} />
+      <Playhead position={playheadX} hidden={playheadHidden} />
     </div>
   );
 };
