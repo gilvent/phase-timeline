@@ -10,16 +10,23 @@ export enum ScrollSyncType {
   Horizontal = "horizontal"
 }
 
+type HookProps = {
+  nodeRef: RefObject<HTMLElement | null>;
+  id: ScrollSyncID;
+  syncTargetId: ScrollSyncID;
+};
+
+export type ElementScroll = {
+  top: number;
+  left: number;
+};
+
 export default function useScrollSync({
   nodeRef,
   id,
   syncTargetId
-}: {
-  nodeRef: RefObject<HTMLElement | null>;
-  id: ScrollSyncID;
-  syncTargetId: ScrollSyncID;
-}) {
-  const elementScroll = useRef<{ top: number; left: number }>({
+}: HookProps): RefObject<ElementScroll> {
+  const elementScroll = useRef<ElementScroll>({
     top: 0,
     left: 0
   });

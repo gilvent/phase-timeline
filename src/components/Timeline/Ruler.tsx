@@ -1,45 +1,78 @@
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import useScrollSync, { ScrollSyncID } from "../../hooks/useScrollSync";
 
 type RulerProps = {
   width: number;
-  onMouseDown: (time: number) => void;
-  onDragging: (time: number) => void;
-  onDraggingEnd: () => void;
+  onMouseDown: ({
+    time,
+    playheadX
+  }: {
+    time: number;
+    playheadX: number;
+  }) => void;
+  onDragging: ({
+    time,
+    playheadX
+  }: {
+    time: number;
+    playheadX: number;
+  }) => void;
+  time: number;
+  onScroll: ({
+    playheadX,
+    shouldHidePlayhead
+  }: {
+    playheadX: number;
+    shouldHidePlayhead: boolean;
+  }) => void;
 };
 
 export const Ruler = ({
   width,
   onMouseDown,
   onDragging,
-  onDraggingEnd
+  onScroll,
+  time
 }: RulerProps) => {
   // TODO: implement mousedown and mousemove to update time and Playhead position
   const nodeRef = useRef<HTMLDivElement | null>(null);
+  const timePosition = useRef<number>(time);
   const isDraggable = useRef<boolean>(false);
   const boundary = useRef({
     left: 0,
     right: 0
   });
-
-  useScrollSync({
+  const scroll = useScrollSync({
     id: ScrollSyncID.Ruler,
     syncTargetId: ScrollSyncID.Keyframe,
     nodeRef
   });
 
+  useEffect(() => {
+    nodeRef.current?.addEventListener("scroll", handleScrollChange);
+
+    return () => {
+      nodeRef.current?.removeEventListener("scroll", handleScrollChange);
+    };
+  }, []);
+
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
       const element = e.target as Element;
       const elementRect = element.getBoundingClientRect();
+      const scrollLeft = scroll.current?.left ?? 0;
 
       isDraggable.current = true;
       boundary.current = {
-        left: elementRect.left,
-        right: elementRect.right
+        left: elementRect.left + scrollLeft,
+        right: elementRect.right + scrollLeft
       };
+      timePosition.current = e.clientX - boundary.current.left + scrollLeft;
 
-      onMouseDown(e.clientX - boundary.current.left);
+      onMouseDown({
+        time: timePosition.current,
+        playheadX: timePosition.current - scrollLeft
+      });
       enableDragging();
     },
     [onMouseDown]
@@ -50,25 +83,20 @@ export const Ruler = ({
       return;
     }
 
-    if (e.clientX < boundary.current.left) {
-      onDragging(0);
-      return;
-    }
+    const scrollLeft = scroll.current?.left ?? 0;
 
-    if (e.clientX > boundary.current.right) {
-      onDragging(width);
-      return;
-    }
+    // TODO handle playhead out of boundary
 
-    requestAnimationFrame(() => {
-      onDragging(e.clientX - boundary.current.left);
+    timePosition.current = e.clientX - boundary.current.left + scrollLeft;
+
+    onDragging({
+      time: timePosition.current,
+      playheadX: timePosition.current - scrollLeft
     });
   }
 
   function endDragging() {
     isDraggable.current = false;
-    onDraggingEnd();
-
     window.removeEventListener("mousemove", handleDragging);
     window.removeEventListener("mouseup", endDragging);
     window.removeEventListener("selectstart", disableSelect);
@@ -82,6 +110,16 @@ export const Ruler = ({
 
   function disableSelect(e: Event) {
     e.preventDefault();
+  }
+
+  function handleScrollChange(e: Event) {
+    const el = e.target as HTMLDivElement;
+    const playheadX = timePosition.current + -1 * el.scrollLeft;
+
+    onScroll({
+      playheadX,
+      shouldHidePlayhead: playheadX < 0
+    });
   }
 
   return (

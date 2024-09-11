@@ -3,34 +3,34 @@ import { NumberInput } from "./NumberInput";
 
 type PlayControlsProps = {
   time: number;
-  setTime: (time: number) => void;
+  onTimeChange: (time: number) => void;
   duration: number;
-  setDuration: (duration: number) => void;
+  onDurationChange: (duration: number) => void;
 };
 
 export const PlayControls = ({
   time,
-  setTime,
+  onTimeChange,
   duration,
-  setDuration
+  onDurationChange
 }: PlayControlsProps) => {
   // TODO: implement time <= maxTime
 
-  const onTimeChange = useCallback(
+  const handleTimeInputChange = useCallback(
     (val: number) => {
-      setTime(val);
+      onTimeChange(val);
     },
-    [setTime]
+    [onTimeChange]
   );
 
-  const onDurationChange = useCallback(
+  const handleDurationInputChange = useCallback(
     (val: number) => {
-      if (val < time) {
-        setTime(val);
+      if (val <= time) {
+        onTimeChange(val);
       }
-      setDuration(val);
+      onDurationChange(val);
     },
-    [setTime, setDuration, time]
+    [onTimeChange, onDurationChange, time]
   );
 
   return (
@@ -43,7 +43,7 @@ export const PlayControls = ({
         Current
         <NumberInput
           value={time}
-          onChange={onTimeChange}
+          onChange={handleTimeInputChange}
           dataTestId="time"
           min={0}
           max={duration}
@@ -56,7 +56,7 @@ export const PlayControls = ({
           dataTestId="max-time"
           min={0}
           max={6000}
-          onChange={onDurationChange}
+          onChange={handleDurationInputChange}
         />
         Duration
       </fieldset>

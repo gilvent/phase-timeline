@@ -1,39 +1,47 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { Playhead } from "./Playhead";
 import { Ruler } from "./Ruler";
 import { TrackList } from "./TrackList";
 import { KeyframeList } from "./KeyframeList";
 import { PlayControls } from "./PlayControls";
 import { roundToNearestPrecision } from "../../utils/math";
+// import { roundToNearestPrecision } from "../../utils/math";
 
 export const Timeline = () => {
   // FIXME: performance concerned
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(2000);
   const [playheadX, setPlayheadX] = useState(time);
-  const isDraggingOnRuler = useRef<boolean>(false);
 
-  useEffect(() => {
-    // on ruler mouse move, Playhead movement is per 1px while PlayControl input increment is per 10px.
-    // this flag is to prevent playhead to move by 10px while dragging
-    if (!isDraggingOnRuler.current) {
-      setPlayheadX(time);
-    }
-  }, [time]);
-
-  function handleRulerDragging(time: number) {
-    isDraggingOnRuler.current = true;
-
-    setTime(roundToNearestPrecision(time, 10));
+  function handlePlayControlTimeChange(time: number) {
+    setTime(time);
     setPlayheadX(time);
   }
 
-  function handleRulerMouseDown(time: number) {
+  function handleRulerDragging({
+    time,
+    playheadX
+  }: {
+    time: number;
+    playheadX: number;
+  }) {
     setTime(roundToNearestPrecision(time, 10));
+    setPlayheadX(playheadX);
   }
 
-  function handleRulerDraggingEnd() {
-    isDraggingOnRuler.current = false;
+  function handleRulerMouseDown({
+    time,
+    playheadX
+  }: {
+    time: number;
+    playheadX: number;
+  }) {
+    setTime(roundToNearestPrecision(time, 10));
+    setPlayheadX(playheadX);
+  }
+
+  function handleRulerScroll({ playheadX }: { playheadX: number }) {
+    setPlayheadX(playheadX);
   }
 
   return (
@@ -44,19 +52,20 @@ export const Timeline = () => {
     >
       <PlayControls
         time={time}
-        setTime={setTime}
         duration={duration}
-        setDuration={setDuration}
+        onTimeChange={handlePlayControlTimeChange}
+        onDurationChange={setDuration}
       />
       <Ruler
         width={duration}
         onMouseDown={handleRulerMouseDown}
         onDragging={handleRulerDragging}
-        onDraggingEnd={handleRulerDraggingEnd}
+        onScroll={handleRulerScroll}
+        time={time}
       />
       <TrackList />
       <KeyframeList />
-      <Playhead time={playheadX} />
+      <Playhead position={playheadX} />
     </div>
   );
 };
