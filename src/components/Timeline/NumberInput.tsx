@@ -105,7 +105,7 @@ export const NumberInput = ({
     if (currentValue.match(/[^0-9]/)) return false;
 
     const value = parseInt(currentValue);
-    return value <= max && value >= min;
+    return value % STEP === 0 && value <= max && value >= min;
   }
 
   return (
