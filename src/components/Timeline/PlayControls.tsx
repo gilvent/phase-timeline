@@ -54,7 +54,7 @@ export const PlayControls = ({
         <NumberInput
           value={duration}
           dataTestId="max-time"
-          min={0}
+          min={100}
           max={6000}
           onChange={handleDurationInputChange}
         />
