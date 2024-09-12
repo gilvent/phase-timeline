@@ -48,7 +48,7 @@ export const Timeline = () => {
         playheadUpdate={handleRulerPlayheadUpdate}
       />
       <TrackList />
-      <KeyframeList />
+      <KeyframeList duration={duration} />
       <Playhead position={playheadX} hidden={playheadHidden} />
     </div>
   );

@@ -5,7 +5,11 @@ import useScrollSync, {
   ScrollSyncType
 } from "../../hooks/useScrollSync";
 
-export const KeyframeList = () => {
+type KeyframeListProps = {
+  duration: number;
+};
+
+export const KeyframeList = ({ duration }: KeyframeListProps) => {
   // TODO: implement scroll sync with `Ruler` and `TrackList`
   const nodeRef = useRef<HTMLDivElement | null>(null);
 
@@ -29,16 +33,16 @@ export const KeyframeList = () => {
       className="px-4 min-w-0 overflow-auto"
       data-testid="keyframe-list"
     >
-      <Segment />
-      <Segment />
-      <Segment />
-      <Segment />
-      <Segment />
-      <Segment />
-      <Segment />
-      <Segment />
-      <Segment />
-      <Segment />
+      <Segment width={duration} />
+      <Segment width={duration} />
+      <Segment width={duration} />
+      <Segment width={duration} />
+      <Segment width={duration} />
+      <Segment width={duration} />
+      <Segment width={duration} />
+      <Segment width={duration} />
+      <Segment width={duration} />
+      <Segment width={duration} />
     </div>
   );
 };
