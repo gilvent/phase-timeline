@@ -7,17 +7,17 @@ type NumberInputProps = {
   onChange: (value: number) => void;
   max: number;
   min: number;
+  step?: number;
   dataTestId?: string;
 };
-
-const STEP = 10;
 
 export const NumberInput = ({
   value: originalValue,
   onChange,
   dataTestId,
   min,
-  max
+  max,
+  step = 10
 }: NumberInputProps) => {
   // TODO: implement time <= maxTime
   const [currentValue, setCurrentValue] = useState<string>(
@@ -60,7 +60,7 @@ export const NumberInput = ({
   function isChangedByStepButton(
     e: React.ChangeEvent<HTMLInputElement>
   ): boolean {
-    return Math.abs(parseInt(currentValue) - parseInt(e.target.value)) === STEP;
+    return Math.abs(parseInt(currentValue) - parseInt(e.target.value)) === step;
   }
 
   function selectAllInputText() {
@@ -77,7 +77,7 @@ export const NumberInput = ({
     } else if (finalValue > max) {
       finalValue = max;
     } else {
-      finalValue = roundToNearestPrecision(finalValue, STEP);
+      finalValue = roundToNearestPrecision(finalValue, step);
     }
 
     setCurrentValue(finalValue.toString());
@@ -105,7 +105,7 @@ export const NumberInput = ({
     if (currentValue.match(/[^0-9]/)) return false;
 
     const value = parseInt(currentValue);
-    return value % STEP === 0 && value <= max && value >= min;
+    return value % step === 0 && value <= max && value >= min;
   }
 
   return (
@@ -118,7 +118,7 @@ export const NumberInput = ({
       data-testid={dataTestId}
       min={min}
       max={max}
-      step={STEP}
+      step={step}
       value={currentValue}
       onChange={handleChange}
       onFocus={handleFocus}
