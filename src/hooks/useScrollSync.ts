@@ -1,19 +1,22 @@
 import { RefObject, useEffect, useRef } from "react";
 
 export enum ScrollSyncID {
-  Keyframe = "keyframe",
-  Ruler = "ruler"
+  KeyframeList = "keyframe-list",
+  Ruler = "ruler",
+  TrackList = "track-list"
 }
 
 // TODO add support for vertical and both
 export enum ScrollSyncType {
-  Horizontal = "horizontal"
+  Horizontal = "horizontal",
+  Vertical = "vertical"
 }
 
 type HookProps = {
   nodeRef: RefObject<HTMLElement | null>;
   id: ScrollSyncID;
   syncTargetId: ScrollSyncID;
+  type?: ScrollSyncType;
 };
 
 export type ElementScroll = {
@@ -24,12 +27,20 @@ export type ElementScroll = {
 export default function useScrollSync({
   nodeRef,
   id,
-  syncTargetId
+  syncTargetId,
+  type = ScrollSyncType.Vertical
 }: HookProps): RefObject<ElementScroll> {
   const elementScroll = useRef<ElementScroll>({
     top: 0,
     left: 0
   });
+  const scrollSyncHandlerByType: Record<
+    ScrollSyncType,
+    (e: CustomEvent) => void
+  > = {
+    [ScrollSyncType.Horizontal]: syncHorizontalScroll,
+    [ScrollSyncType.Vertical]: syncVerticalScroll
+  };
 
   useEffect(() => {
     nodeRef.current?.addEventListener("scroll", dispatchScrollEvent);
@@ -40,7 +51,9 @@ export default function useScrollSync({
   }, []);
 
   useEffect(() => {
-    const scrollSyncHandler = syncHorizontalScroll as (e: Event) => void;
+    const scrollSyncHandler = scrollSyncHandlerByType[type] as (
+      e: Event
+    ) => void;
 
     window.addEventListener(scrollEventName(syncTargetId), scrollSyncHandler);
 
@@ -74,10 +87,19 @@ export default function useScrollSync({
   }
 
   function syncHorizontalScroll(e: CustomEvent) {
-    if (nodeRef.current) {
-      nodeRef.current.scrollLeft = e.detail.scrollLeft;
-      elementScroll.current.left = e.detail.scrollLeft;
+    if (!nodeRef.current) {
+      return;
     }
+    nodeRef.current.scrollLeft = e.detail.scrollLeft;
+    elementScroll.current.left = e.detail.scrollLeft;
+  }
+
+  function syncVerticalScroll(e: CustomEvent) {
+    if (!nodeRef.current) {
+      return;
+    }
+    nodeRef.current.scrollTop = e.detail.scrollTop;
+    elementScroll.current.top = e.detail.scrollTop;
   }
 
   return elementScroll;

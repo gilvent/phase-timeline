@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useRef } from "react";
-import useScrollSync, { ScrollSyncID } from "../../hooks/useScrollSync";
+import useScrollSync, {
+  ScrollSyncID,
+  ScrollSyncType
+} from "../../hooks/useScrollSync";
 
 type RulerProps = {
   width: number;
@@ -31,8 +34,9 @@ export const Ruler = ({
 
   useScrollSync({
     id: ScrollSyncID.Ruler,
-    syncTargetId: ScrollSyncID.Keyframe,
-    nodeRef
+    syncTargetId: ScrollSyncID.KeyframeList,
+    nodeRef,
+    type: ScrollSyncType.Horizontal
   });
 
   useEffect(() => {

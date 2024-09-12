@@ -1,8 +1,23 @@
+import { useRef } from "react";
+import useScrollSync, {
+  ScrollSyncID,
+  ScrollSyncType
+} from "../../hooks/useScrollSync";
+
 export const TrackList = () => {
   // TODO: implement scroll sync with `KeyframeList`
+  const nodeRef = useRef<HTMLDivElement | null>(null);
+
+  useScrollSync({
+    id: ScrollSyncID.TrackList,
+    syncTargetId: ScrollSyncID.KeyframeList,
+    nodeRef,
+    type: ScrollSyncType.Vertical
+  });
 
   return (
     <div
+      ref={nodeRef}
       className="grid grid-flow-row auto-rows-[40px]
       border-r border-solid border-r-gray-700 
       overflow-auto"
