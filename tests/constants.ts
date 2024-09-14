@@ -5,5 +5,6 @@ export const testIds = {
   timeInput: 'time',
   durationInput: 'max-time',
   playhead: 'playhead',
-  ruler: 'ruler'
+  ruler: 'ruler',
+  rulerDraggableArea: 'ruler-draggable-area'
 }
