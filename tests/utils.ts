@@ -26,25 +26,24 @@ export async function getElementScroll(
 
 export async function scrollHorizontal(
   locator: Locator,
-  distance: number
+  x: number
 ): Promise<void> {
   return await locator.evaluate(
-    (node, distance: number) => {
-      console.log(distance)
-      node.scrollLeft += distance;
+    (node, x: number) => {
+      node.scrollLeft += x;
     },
-    distance
+    x
   );
 }
 
 export async function scrollVertical(
   locator: Locator,
-  distance: number
+  y: number
 ): Promise<void> {
   return await locator.evaluate(
-    (node, distance: number) => {
-      node.scrollTop += distance;
+    (node, y: number) => {
+      node.scrollTop += y;
     },
-    distance
+    y
   );
 }
