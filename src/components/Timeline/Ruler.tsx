@@ -25,11 +25,9 @@ export const Ruler = ({
   const scrollLeft = useRef<number>(0);
   const draggableAreaLeft = useRef<number>(0);
 
-  const visibleBounds = useRef({
+  const dragBounds = useRef({
     left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0
+    right: 0
   });
 
   useScrollSync({
@@ -68,24 +66,8 @@ export const Ruler = ({
       e.preventDefault();
       const draggableArea = e.target as Element;
       const draggableAreaRect = draggableArea.getBoundingClientRect();
-      const outerAreaRect = nodeRef.current?.getBoundingClientRect() ?? {
-        left: 0,
-        right: 0
-      };
 
-      visibleBounds.current = {
-        left:
-          draggableAreaRect.left >= outerAreaRect.left
-            ? draggableAreaRect.left
-            : outerAreaRect.left,
-        right:
-          draggableAreaRect.right <= outerAreaRect.right
-            ? draggableAreaRect.right
-            : outerAreaRect.right,
-        top: draggableAreaRect.top,
-        bottom: draggableAreaRect.bottom
-      };
-
+      updateDragBounds()
       isDraggable.current = true;
       timePosition.current = e.clientX - draggableAreaRect.left;
       draggableAreaLeft.current = draggableAreaRect.left;
@@ -105,17 +87,17 @@ export const Ruler = ({
         return;
       }
 
-      if (e.clientX <= visibleBounds.current.left) {
+      if (e.clientX <= dragBounds.current.left) {
         timePosition.current =
-          visibleBounds.current.left - draggableAreaLeft.current;
+          dragBounds.current.left - draggableAreaLeft.current;
         timeUpdate(timePosition.current);
         playheadUpdate(timePosition.current - scrollLeft.current, false);
         return;
       }
 
-      if (e.clientX >= visibleBounds.current.right) {
+      if (e.clientX >= dragBounds.current.right) {
         timePosition.current =
-          visibleBounds.current.right - draggableAreaLeft.current;
+          dragBounds.current.right - draggableAreaLeft.current;
         timeUpdate(timePosition.current);
         playheadUpdate(timePosition.current - scrollLeft.current, false);
         return;
@@ -147,8 +129,8 @@ export const Ruler = ({
 
   function handleScrollChange(e: Event) {
     const el = e.target as HTMLDivElement;
-    scrollLeft.current = el.scrollLeft;
 
+    scrollLeft.current = el.scrollLeft;
     playheadUpdate(timePosition.current - scrollLeft.current, isOutOfBounds());
   }
 
@@ -166,6 +148,29 @@ export const Ruler = ({
       timePosition.current + draggableArea.left < outerAreaRect.left ||
       timePosition.current + draggableArea.left > outerAreaRect.right
     );
+  }
+
+  function updateDragBounds() {
+    const draggableAreaRect =
+      draggableAreaRef.current?.getBoundingClientRect() ?? {
+        left: 0,
+        right: 0
+      };
+    const outerAreaRect = nodeRef.current?.getBoundingClientRect() ?? {
+      left: 0,
+      right: 0
+    };
+
+    dragBounds.current = {
+      left:
+        draggableAreaRect.left >= outerAreaRect.left
+          ? draggableAreaRect.left
+          : outerAreaRect.left,
+      right:
+        draggableAreaRect.right <= outerAreaRect.right
+          ? draggableAreaRect.right
+          : outerAreaRect.right
+    };
   }
 
   return (
