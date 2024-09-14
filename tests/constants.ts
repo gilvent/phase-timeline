@@ -7,5 +7,7 @@ export const testIds = {
   playhead: "playhead",
   ruler: "ruler",
   rulerDraggableArea: "ruler-draggable-area",
-  keyframeList: "keyframe-list"
+  keyframeList: "keyframe-list",
+  trackList: "track-list",
+  segment: "segment"
 };

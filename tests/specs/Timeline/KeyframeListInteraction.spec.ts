@@ -6,9 +6,44 @@ import {
   scrollHorizontal
 } from "../../utils";
 
-test.describe("Timeline: KeyframeList", () => {
+test.describe("Timeline: KeyframeList Interaction", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(pageUrl);
+  });
+
+  test("segment length should visually represent duration (1px = 1ms duration)", async ({
+    page
+  }) => {
+    const timeline = await page.getByTestId(testIds.timeline);
+    const durationInput = await timeline.getByTestId(testIds.durationInput);
+    const keyframeList = await timeline.getByTestId(testIds.keyframeList)
+    const segment = await keyframeList.getByTestId(
+      testIds.segment
+    );
+    const { width } = await getElementDOMRect(segment.first());
+    const duration = await durationInput.inputValue();
+
+    await expect(width).toEqual(parseInt(duration));
+  });
+
+  test("should update segment length when duration is changed", async ({
+    page
+  }) => {
+    const timeline = await page.getByTestId(testIds.timeline);
+    const durationInput = await timeline.getByTestId(testIds.durationInput);
+    const keyframeList = await timeline.getByTestId(testIds.keyframeList)
+    const segment = await keyframeList.getByTestId(
+      testIds.segment
+    );
+
+    await durationInput.click();
+    await page.keyboard.type("1000");
+    await page.mouse.click(0, 0);
+
+    const { width } = await getElementDOMRect(segment.first());
+    const duration = await durationInput.inputValue();
+
+    await expect(width).toEqual(parseInt(duration));
   });
 
   test("should synchronize horizontal scroll with Ruler", async ({
@@ -28,7 +63,10 @@ test.describe("Timeline: KeyframeList", () => {
     await scrollHorizontal(rulerContainer, 300);
     await page.waitForTimeout(200);
 
-    const { scrollLeft } = await getElementScroll(keyframeList);
-    expect(scrollLeft).not.toEqual(0);
+    const { scrollTop: rulerContainerScrollTop } = await getElementScroll(rulerContainer);
+    const { scrollTop: keyframeListScrollTop } =
+      await getElementScroll(keyframeList);
+
+    expect(keyframeListScrollTop).toEqual(rulerContainerScrollTop);
   });
 });
