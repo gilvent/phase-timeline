@@ -146,34 +146,6 @@ test.describe("Timeline: Time Input", () => {
     await expect(initialPlayheadX).toEqual(lastPlayheadX);
   });
 
-  test("should round decimal to nearest integer (round to nearest 10)", async ({
-    page
-  }) => {
-    await page.goto(pageUrl);
-    const timeline = await page.getByTestId(testIds.timeline);
-    const timeInput = await timeline.getByTestId(testIds.timeInput);
-
-    await timeInput.click();
-    await page.keyboard.type("105.5");
-    await page.keyboard.press("Enter");
-
-    await expect(timeInput).toHaveValue("110");
-  });
-
-  test("should adjust negative value to minimum allowed value (min is 0)", async ({
-    page
-  }) => {
-    await page.goto(pageUrl);
-    const timeline = await page.getByTestId(testIds.timeline);
-    const timeInput = await timeline.getByTestId(testIds.timeInput);
-
-    await timeInput.click();
-    await page.keyboard.type("-10");
-    await page.keyboard.press("Enter");
-
-    await expect(timeInput).toHaveValue("0");
-  });
-
   test("should remove any leading zeros", async ({
     page
   }) => {
@@ -203,7 +175,54 @@ test.describe("Timeline: Time Input", () => {
     await timeInput.click()
     await page.keyboard.type(".");
     await page.keyboard.press("Enter");
-    
+
     await expect(timeInput).toHaveValue("100");
+  });
+
+  test("should adjust value if lower than 0ms", async ({
+    page
+  }) => {
+    await page.goto(pageUrl);
+    const timeline = await page.getByTestId(testIds.timeline);
+    const timeInput = await timeline.getByTestId(testIds.timeInput);
+
+    await timeInput.click();
+    await page.keyboard.type("-10");
+    await page.keyboard.press("Enter");
+
+    await expect(timeInput).toHaveValue("0");
+  });
+
+  test("should adjust value if exceeding duration", async ({
+    page
+  }) => {
+    await page.goto(pageUrl);
+    const timeline = await page.getByTestId(testIds.timeline);
+    const timeInput = await timeline.getByTestId(testIds.timeInput);
+    const duration = await timeline.getByTestId(testIds.durationInput);
+
+    await duration.click();
+    await page.keyboard.type("2000");
+    await page.keyboard.press("Enter");
+
+    await timeInput.click();
+    await page.keyboard.type("2001");
+    await page.keyboard.press("Enter");
+
+    await expect(timeInput).toHaveValue("2000");
+  });
+
+  test("should round decimal to nearest integer (round to nearest 10)", async ({
+    page
+  }) => {
+    await page.goto(pageUrl);
+    const timeline = await page.getByTestId(testIds.timeline);
+    const timeInput = await timeline.getByTestId(testIds.timeInput);
+
+    await timeInput.click();
+    await page.keyboard.type("105.5");
+    await page.keyboard.press("Enter");
+
+    await expect(timeInput).toHaveValue("110");
   });
 });
