@@ -47,7 +47,7 @@
     "not op_mini all"
   ],
   "lint-staged": {
-    "./src/**/*.{js,jsx,ts,tsx}": "eslint --config ./.eslintrc.json --fix",
-    "./src/**/*.{js,jsx,ts,tsx,scss,json}": "prettier --config ./.prettierrc.json --write"
+    "./{src|test}/**/*.{js,jsx,ts,tsx}": "eslint --config ./.eslintrc.json --fix",
+    "./{src|test}/**/*.{js,jsx,ts,tsx,scss,json}": "prettier --config ./.prettierrc.json --write"
   }
 }
