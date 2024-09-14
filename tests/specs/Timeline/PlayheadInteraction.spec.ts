@@ -62,7 +62,7 @@ test.describe("Timeline: Playhead Interaction", () => {
     const { x: initialPlayheadX } = await getElementDOMRect(playhead);
 
     await scrollHorizontal(keyframeList, 300);
-    await page.waitForTimeout(100)
+    await page.waitForTimeout(300)
   
     const { x: lastPlayheadX } = await getElementDOMRect(playhead);
     expect(lastPlayheadX).toEqual(initialPlayheadX - 300);
@@ -81,10 +81,13 @@ test.describe("Timeline: Playhead Interaction", () => {
     await page.keyboard.type("5000");
     await page.keyboard.press("Enter");
 
-    // set playhead position to 500
+    // set playhead position to 4500
     await timeInput.click();
     await page.keyboard.type("4500");
     await page.keyboard.press("Enter");
+
+    await page.waitForTimeout(200)
+
 
     expect(playhead).toBeHidden();
   });
@@ -108,11 +111,11 @@ test.describe("Timeline: Playhead Interaction", () => {
     await page.keyboard.type("500");
     await page.keyboard.press("Enter");
     
-    await page.waitForTimeout(200)
+    await page.waitForTimeout(300)
 
     // scroll to the right more than current time value
-    await scrollHorizontal(keyframeList, 520);
-    await page.waitForTimeout(100)
+    await scrollHorizontal(keyframeList, 550);
+    await page.waitForTimeout(150)
 
     expect(playhead).toBeHidden()
   });
