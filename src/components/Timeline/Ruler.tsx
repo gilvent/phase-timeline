@@ -59,6 +59,7 @@ export const Ruler = ({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
+      e.preventDefault()
       const draggableArea = e.target as Element;
       const draggableAreaRect = draggableArea.getBoundingClientRect();
       const outerAreaRect = nodeRef.current?.getBoundingClientRect() ?? {
@@ -93,6 +94,7 @@ export const Ruler = ({
 
   const handleDragging = useCallback(
     (e: MouseEvent) => {
+      e.preventDefault();
       if (!isDraggable.current) {
         return;
       }
@@ -169,6 +171,7 @@ export const Ruler = ({
       data-testid="ruler"
     >
       <div
+        data-testid="ruler-draggable-area"
         ref={draggableAreaRef}
         className="w-[2000px] h-6 rounded-md bg-white/25"
         onMouseDown={handleMouseDown}
