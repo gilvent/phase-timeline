@@ -1,8 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { pageUrl, testIds } from "../../constants";
-import {
-  getElementDOMRect,
-} from "../../utils";
+import { getElementDOMRect, scrollHorizontal } from "../../utils";
 
 test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
   async function expectPlayheadPositionEqualToMousePosition(
@@ -21,7 +19,9 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     await page.goto(pageUrl);
   });
 
-  test("should update playhead position when clicking on ruler", async ({ page }) => {
+  test("should update playhead position when clicking on ruler", async ({
+    page
+  }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const rulerDraggableArea = await timeline.getByTestId(
       testIds.rulerDraggableArea
@@ -69,6 +69,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     await page.mouse.move(clickX, rulerAreaY + 10);
     await page.mouse.down();
     await page.mouse.move(clickX + dragDistance, rulerAreaY + 10);
+    await page.mouse.up();
 
     const time = await timeInput.inputValue();
     const timeDiff = parseInt(time) - parseInt(prevTime);
@@ -76,7 +77,9 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     await expect(timeDiff).toEqual(300);
   });
 
-  test("should update playhead position when dragging playhead", async ({ page }) => {
+  test("should update playhead position when dragging playhead", async ({
+    page
+  }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const rulerDraggableArea = await timeline.getByTestId(
       testIds.rulerDraggableArea
@@ -90,6 +93,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     await page.mouse.move(initialClickX, rulerAreaY + 10);
     await page.mouse.down();
     await page.mouse.move(initialClickX + dragDistance, rulerAreaY + 10);
+    await page.mouse.up();
 
     const { x: playheadX } = await getElementDOMRect(playhead);
 
@@ -97,5 +101,147 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
       playheadX,
       initialClickX + dragDistance
     );
+  });
+
+  test.describe("when ruler is not scrolled and smaller than container", () => {
+    test("playhead should stay at left bounds when dragged across left bounds", async ({
+      page
+    }) => {
+      const timeline = await page.getByTestId(testIds.timeline);
+      const rulerDraggableArea = await timeline.getByTestId(
+        testIds.rulerDraggableArea
+      );
+      const playhead = await timeline.getByTestId(testIds.playhead);
+      const { x: rulerAreaX, y: rulerAreaY } =
+        await getElementDOMRect(rulerDraggableArea);
+
+      await page.mouse.move(rulerAreaX + 100, rulerAreaY + 10);
+      await page.mouse.down();
+
+      // dragged across left bounds
+      await page.mouse.move(rulerAreaX - 200, rulerAreaY + 10);
+      await page.mouse.up();
+
+      const { x: playheadX } = await getElementDOMRect(playhead);
+
+      await expectPlayheadPositionEqualToMousePosition(playheadX, rulerAreaX);
+    });
+
+    test("playhead should stay at right bounds when dragged across right bounds", async ({
+      page
+    }) => {
+      const timeline = await page.getByTestId(testIds.timeline);
+      const durationInput = await page.getByTestId(testIds.durationInput);
+      const rulerDraggableArea = await timeline.getByTestId(
+        testIds.rulerDraggableArea
+      );
+      const playhead = await timeline.getByTestId(testIds.playhead);
+
+      // set ruler width by setting duration
+      await durationInput.click();
+      await page.keyboard.type("500");
+      await page.keyboard.press("Enter");
+
+      const {
+        x: rulerAreaX,
+        y: rulerAreaY,
+        right: rulerAreaRight
+      } = await getElementDOMRect(rulerDraggableArea);
+
+      await page.mouse.move(rulerAreaX + 100, rulerAreaY + 10);
+      await page.mouse.down();
+
+      // dragged across right bounds
+      await page.mouse.move(rulerAreaX + 700, rulerAreaY + 10);
+      await page.mouse.up();
+
+      const { x: playheadX } = await getElementDOMRect(playhead);
+
+      await expectPlayheadPositionEqualToMousePosition(
+        playheadX,
+        rulerAreaRight
+      );
+    });
+  });
+
+  test.describe("when ruler is not scrolled and bigger than container", () => {
+    test("playhead should stay at container right bounds when dragged across right bounds", async ({
+      page
+    }) => {
+      const timeline = await page.getByTestId(testIds.timeline);
+      const durationInput = await page.getByTestId(testIds.durationInput);
+      const rulerContainer = await timeline.getByTestId(testIds.ruler);
+      const rulerDraggableArea = await timeline.getByTestId(
+        testIds.rulerDraggableArea
+      );
+      const playhead = await timeline.getByTestId(testIds.playhead);
+
+      // set ruler width by setting duration
+      await durationInput.click();
+      await page.keyboard.type("5000");
+      await page.keyboard.press("Enter");
+
+      const { x: rulerAreaX, y: rulerAreaY } =
+        await getElementDOMRect(rulerDraggableArea);
+
+      const { right: rulerContainerRight } =
+        await getElementDOMRect(rulerContainer);
+
+      await page.mouse.move(rulerAreaX + 100, rulerAreaY + 10);
+      await page.mouse.down();
+
+      // dragged across right bounds
+      await page.mouse.move(rulerAreaX + 1000, rulerAreaY + 10);
+      await page.mouse.up();
+
+      const { x: playheadX } = await getElementDOMRect(playhead);
+
+      await expectPlayheadPositionEqualToMousePosition(
+        playheadX,
+        rulerContainerRight
+      );
+    });
+  });
+
+  test.describe("when ruler is scrolled and bigger than container", () => {
+    test("playhead should stay at container left bounds when dragged across left bounds", async ({
+      page
+    }) => {
+      const timeline = await page.getByTestId(testIds.timeline);
+      const durationInput = await page.getByTestId(testIds.durationInput);
+      const rulerContainer = await timeline.getByTestId(testIds.ruler);
+      const rulerDraggableArea = await timeline.getByTestId(
+        testIds.rulerDraggableArea
+      );
+      const playhead = await timeline.getByTestId(testIds.playhead);
+
+      // set ruler width by setting duration
+      await durationInput.click();
+      await page.keyboard.type("5000");
+      await page.keyboard.press("Enter");
+
+      const { y: rulerAreaY } =
+        await getElementDOMRect(rulerDraggableArea);
+
+      const { x: rulerContainerX, left: rulerContainerLeft } =
+        await getElementDOMRect(rulerContainer);
+
+      // scroll the container
+      await scrollHorizontal(rulerContainer, 300);
+
+      await page.mouse.click(rulerContainerX + 100, rulerAreaY + 10);
+
+      // dragged across right bounds
+      await page.mouse.down();
+      await page.mouse.move(rulerContainerX - 50, rulerAreaY + 10);
+      await page.mouse.up();
+
+      const { x: playheadX } = await getElementDOMRect(playhead);
+
+      await expectPlayheadPositionEqualToMousePosition(
+        playheadX,
+        rulerContainerLeft
+      );
+    });
   });
 });
