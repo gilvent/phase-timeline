@@ -40,6 +40,12 @@ export const Ruler = ({
   });
 
   useEffect(() => {
+    if (nodeRef.current) {
+      nodeRef.current.scrollLeft = 0;
+    }
+  }, []);
+
+  useEffect(() => {
     nodeRef.current?.addEventListener("scroll", handleScrollChange);
 
     return () => {
@@ -59,7 +65,7 @@ export const Ruler = ({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
-      e.preventDefault()
+      e.preventDefault();
       const draggableArea = e.target as Element;
       const draggableAreaRect = draggableArea.getBoundingClientRect();
       const outerAreaRect = nodeRef.current?.getBoundingClientRect() ?? {
