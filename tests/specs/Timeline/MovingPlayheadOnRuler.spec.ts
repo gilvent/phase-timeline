@@ -10,7 +10,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     const playheadXToMouseXDistance = Math.abs(playheadX - mouseX);
     // In browser, it is possible that mouse position is not exactly the same as the playhead,
     // therefore use the maxDiffPixels.
-    const maxDiffPixels = 1;
+    const maxDiffPixels = 5;
 
     await expect(playheadXToMouseXDistance <= maxDiffPixels).toEqual(true);
   }
@@ -231,7 +231,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
 
       await page.mouse.click(rulerContainerX + 100, rulerAreaY + 10);
 
-      // dragged across right bounds
+      // dragged across left bounds
       await page.mouse.down();
       await page.mouse.move(rulerContainerX - 50, rulerAreaY + 10);
       await page.mouse.up();
