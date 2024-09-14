@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { pageUrl, testIds } from "../../constants";
-import { getPositionByLocator } from "../../utils";
+import { getElementDOMRect } from "../../utils";
 
 test.describe("Timeline: Time Input", () => {
   test("should gain focus on click", async ({ page }) => {
@@ -18,12 +18,12 @@ test.describe("Timeline: Time Input", () => {
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
-    const { x: initialPlayheadX } = await getPositionByLocator(playhead);
+    const { x: initialPlayheadX } = await getElementDOMRect(playhead);
 
     await timeInput.click();
     await page.keyboard.type("100");
 
-    const { x: lastPlayheadX } = await getPositionByLocator(playhead);
+    const { x: lastPlayheadX } = await getElementDOMRect(playhead);
 
     await expect(timeInput).toHaveValue("100");
     // same playhead position means time value is not updated
@@ -35,13 +35,13 @@ test.describe("Timeline: Time Input", () => {
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
-    const { x: initialPlayheadX } = await getPositionByLocator(playhead);
+    const { x: initialPlayheadX } = await getElementDOMRect(playhead);
 
     await timeInput.click();
     await page.keyboard.type("100");
     await page.keyboard.press("Enter");
 
-    const { x: lastPlayheadX } = await getPositionByLocator(playhead);
+    const { x: lastPlayheadX } = await getElementDOMRect(playhead);
 
     await expect(timeInput).toHaveValue("100");
     await expect(timeInput).not.toBeFocused();
@@ -56,13 +56,13 @@ test.describe("Timeline: Time Input", () => {
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
-    const { x: initialPlayheadX } = await getPositionByLocator(playhead);
+    const { x: initialPlayheadX } = await getElementDOMRect(playhead);
 
     await timeInput.click();
     await page.keyboard.type("100");
     await page.mouse.click(0, 0);
 
-    const { x: lastPlayheadX } = await getPositionByLocator(playhead);
+    const { x: lastPlayheadX } = await getElementDOMRect(playhead);
 
     await expect(timeInput).toHaveValue("100");
     await expect(timeInput).not.toBeFocused();
@@ -75,13 +75,13 @@ test.describe("Timeline: Time Input", () => {
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
-    const { x: initialPlayheadX } = await getPositionByLocator(playhead);
+    const { x: initialPlayheadX } = await getElementDOMRect(playhead);
 
     await timeInput.click();
     await page.keyboard.type("100");
     await page.keyboard.press("Tab");
 
-    const { x: lastPlayheadX } = await getPositionByLocator(playhead);
+    const { x: lastPlayheadX } = await getElementDOMRect(playhead);
 
     await expect(timeInput).toHaveValue("100");
     await expect(timeInput).not.toBeFocused();
@@ -109,11 +109,11 @@ test.describe("Timeline: Time Input", () => {
     await page.keyboard.type("100");
 
     for (const e of expectations) {
-      const { x: initialPlayheadX } = await getPositionByLocator(playhead);
+      const { x: initialPlayheadX } = await getElementDOMRect(playhead);
 
       await page.keyboard.press(e.key);
 
-      const { x: lastPlayheadX } = await getPositionByLocator(playhead);
+      const { x: lastPlayheadX } = await getElementDOMRect(playhead);
 
       await expect(timeInput).toHaveValue(e.inputValue);
       // changing playhead position means time value is updated
@@ -132,13 +132,13 @@ test.describe("Timeline: Time Input", () => {
     // set the value to 100
     await page.keyboard.press("Enter");
 
-    const { x: initialPlayheadX } = await getPositionByLocator(playhead);
+    const { x: initialPlayheadX } = await getElementDOMRect(playhead);
 
     await timeInput.click();
     await page.keyboard.type("130");
     await page.keyboard.press("Escape");
 
-    const { x: lastPlayheadX } = await getPositionByLocator(playhead);
+    const { x: lastPlayheadX } = await getElementDOMRect(playhead);
 
     await expect(timeInput).toHaveValue("100");
     await expect(timeInput).not.toBeFocused();
@@ -146,9 +146,7 @@ test.describe("Timeline: Time Input", () => {
     await expect(initialPlayheadX).toEqual(lastPlayheadX);
   });
 
-  test("should remove any leading zeros", async ({
-    page
-  }) => {
+  test("should remove any leading zeros", async ({ page }) => {
     await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
@@ -172,16 +170,14 @@ test.describe("Timeline: Time Input", () => {
     await page.keyboard.type("100");
     await page.keyboard.press("Enter");
 
-    await timeInput.click()
+    await timeInput.click();
     await page.keyboard.type(".");
     await page.keyboard.press("Enter");
 
     await expect(timeInput).toHaveValue("100");
   });
 
-  test("should adjust value if lower than 0ms", async ({
-    page
-  }) => {
+  test("should adjust value if lower than 0ms", async ({ page }) => {
     await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
@@ -193,9 +189,7 @@ test.describe("Timeline: Time Input", () => {
     await expect(timeInput).toHaveValue("0");
   });
 
-  test("should adjust value if exceeding duration", async ({
-    page
-  }) => {
+  test("should adjust value if exceeding duration", async ({ page }) => {
     await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);

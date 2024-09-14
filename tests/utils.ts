@@ -11,7 +11,7 @@ export async function isInputSelected(input: Locator): Promise<boolean> {
   );
 }
 
-export async function getPositionByLocator(
+export async function getElementDOMRect(
   locator: Locator
 ): Promise<{ x: number; y: number }> {
   return await locator.evaluate(node => {
