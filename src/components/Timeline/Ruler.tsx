@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import useScrollSync, {
   ScrollSyncID,
   ScrollSyncType
@@ -19,12 +19,17 @@ export const Ruler = ({
 }: RulerProps) => {
   // TODO: implement mousedown and mousemove to update time and Playhead position
   const nodeRef = useRef<HTMLDivElement | null>(null);
-  const draggableAreaRef = useRef<HTMLDivElement | null>(null);
-  const timePosition = useRef<number>(time);
+  const rulerBarRef = useRef<HTMLDivElement | null>(null);
   const isDraggable = useRef<boolean>(false);
   const scrollLeft = useRef<number>(0);
-  const draggableAreaLeft = useRef<number>(0);
-
+  const rulerBarRect = useRef<DOMRect | null>(null);
+  const rulerRect = useRef<{
+    left: number;
+    right: number;
+  }>({
+    left: 0,
+    right: 0
+  });
   const dragBounds = useRef({
     left: 0,
     right: 0
@@ -38,10 +43,14 @@ export const Ruler = ({
   });
 
   useEffect(() => {
-    if (nodeRef.current) {
-      nodeRef.current.scrollLeft = 0;
-    }
+    initComponent();
   }, []);
+
+  useEffect(() => {
+    if (!isDraggable.current) {
+      playheadUpdate(time - scrollLeft.current, isOutOfBounds(time));
+    }
+  }, [time]);
 
   useEffect(() => {
     nodeRef.current?.addEventListener("scroll", handleScrollChange);
@@ -49,68 +58,66 @@ export const Ruler = ({
     return () => {
       nodeRef.current?.removeEventListener("scroll", handleScrollChange);
     };
-  }, []);
-
-  useEffect(() => {
-    timePosition.current = time;
-    if (!isDraggable.current) {
-      playheadUpdate(
-        timePosition.current - scrollLeft.current,
-        isOutOfBounds()
-      );
-    }
   }, [time]);
 
-  const handleMouseDown = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      e.preventDefault();
-      const draggableArea = e.target as Element;
-      const draggableAreaRect = draggableArea.getBoundingClientRect();
 
-      updateDragBounds()
-      isDraggable.current = true;
-      timePosition.current = e.clientX - draggableAreaRect.left;
-      draggableAreaLeft.current = draggableAreaRect.left;
+  function initComponent() {
+    if (!nodeRef.current || !rulerBarRef.current) return;
 
-      timeUpdate(timePosition.current);
-      playheadUpdate(timePosition.current - scrollLeft.current, false);
+    nodeRef.current.scrollLeft = 0;
+    rulerRect.current = nodeRef.current.getBoundingClientRect();
+    rulerBarRect.current = rulerBarRef.current.getBoundingClientRect();
 
-      enableDragging();
-    },
-    [timeUpdate, playheadUpdate]
-  );
+    dragBounds.current = updatedDragBounds(rulerBarRect.current);
+  }
 
-  const handleDragging = useCallback(
-    (e: MouseEvent) => {
-      e.preventDefault();
-      if (!isDraggable.current) {
-        return;
-      }
+  function handleScrollChange(e: Event) {
+    if (!rulerBarRef.current) return;
+    const el = e.target as HTMLDivElement;
 
-      if (e.clientX <= dragBounds.current.left) {
-        timePosition.current =
-          dragBounds.current.left - draggableAreaLeft.current;
-        timeUpdate(timePosition.current);
-        playheadUpdate(timePosition.current - scrollLeft.current, false);
-        return;
-      }
+    rulerBarRect.current = rulerBarRef.current.getBoundingClientRect();
+    scrollLeft.current = el.scrollLeft;
+    dragBounds.current = updatedDragBounds(rulerBarRect.current);
+    
+    playheadUpdate(time - scrollLeft.current, isOutOfBounds(time));
+  }
 
-      if (e.clientX >= dragBounds.current.right) {
-        timePosition.current =
-          dragBounds.current.right - draggableAreaLeft.current;
-        timeUpdate(timePosition.current);
-        playheadUpdate(timePosition.current - scrollLeft.current, false);
-        return;
-      }
+  function handleMouseDown(e: React.MouseEvent<HTMLDivElement>) {
+    e.preventDefault();
+    const rulerBar = e.target as Element;
+    const rect = rulerBar.getBoundingClientRect();
+    const updatedTime = e.clientX - rect.left;
 
-      timePosition.current = e.clientX - draggableAreaLeft.current;
-      timeUpdate(timePosition.current);
-      playheadUpdate(timePosition.current - scrollLeft.current, false);
-    },
-    [timeUpdate, playheadUpdate]
-  );
+    rulerBarRect.current = rect;
+    isDraggable.current = true;
+    dragBounds.current = updatedDragBounds(rulerBarRect.current);
+
+    timeUpdate(updatedTime);
+    playheadUpdate(updatedTime - scrollLeft.current, false);
+    enableDragging();
+  }
+
+  function handleDragging(e: MouseEvent) {
+    e.preventDefault();
+    if (!isDraggable.current) {
+      return;
+    }
+    let updatedTime;
+
+    if (e.clientX <= dragBounds.current.left) {
+      updatedTime = dragBounds.current.left - rulerBarRect.current!.left;
+    } else if (e.clientX >= dragBounds.current.right) {
+      updatedTime = dragBounds.current.right - rulerBarRect.current!.left;
+    } else {
+      updatedTime = e.clientX - rulerBarRect.current!.left;
+    }
+
+    timeUpdate(updatedTime);
+    playheadUpdate(updatedTime - scrollLeft.current, false);
+  }
 
   function enableDragging() {
+    isDraggable.current = true;
     window.addEventListener("mousemove", handleDragging);
     window.addEventListener("mouseup", endDragging);
     window.addEventListener("selectstart", disableSelect);
@@ -127,49 +134,24 @@ export const Ruler = ({
     e.preventDefault();
   }
 
-  function handleScrollChange(e: Event) {
-    const el = e.target as HTMLDivElement;
-
-    scrollLeft.current = el.scrollLeft;
-    playheadUpdate(timePosition.current - scrollLeft.current, isOutOfBounds());
-  }
-
-  function isOutOfBounds() {
-    const draggableArea = draggableAreaRef.current?.getBoundingClientRect() ?? {
-      left: 0,
-      right: 0
-    };
-    const outerAreaRect = nodeRef.current?.getBoundingClientRect() ?? {
-      left: 0,
-      right: 0
-    };
-
+  function isOutOfBounds(time: number): boolean {
+    if (!rulerBarRect.current) return false
     return (
-      timePosition.current + draggableArea.left < outerAreaRect.left ||
-      timePosition.current + draggableArea.left > outerAreaRect.right
+      time + rulerBarRect.current.left < dragBounds.current.left ||
+      time + rulerBarRect.current.left > dragBounds.current.right
     );
   }
 
-  function updateDragBounds() {
-    const draggableAreaRect =
-      draggableAreaRef.current?.getBoundingClientRect() ?? {
-        left: 0,
-        right: 0
-      };
-    const outerAreaRect = nodeRef.current?.getBoundingClientRect() ?? {
-      left: 0,
-      right: 0
-    };
-
-    dragBounds.current = {
+  function updatedDragBounds(rulerBarRect: DOMRect) {
+    return {
       left:
-        draggableAreaRect.left >= outerAreaRect.left
-          ? draggableAreaRect.left
-          : outerAreaRect.left,
+        rulerBarRect.left >= rulerRect.current.left
+          ? rulerBarRect.left
+          : rulerRect.current.left,
       right:
-        draggableAreaRect.right <= outerAreaRect.right
-          ? draggableAreaRect.right
-          : outerAreaRect.right
+        rulerBarRect.right <= rulerRect.current.right
+          ? rulerBarRect.right
+          : rulerRect.current.right
     };
   }
 
@@ -183,7 +165,7 @@ export const Ruler = ({
     >
       <div
         data-testid="ruler-bar"
-        ref={draggableAreaRef}
+        ref={rulerBarRef}
         className="w-[2000px] h-6 rounded-md bg-white/25"
         onMouseDown={handleMouseDown}
         style={{ width }}
