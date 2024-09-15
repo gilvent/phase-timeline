@@ -1,10 +1,13 @@
 import { test, expect } from "@playwright/test";
-import { pageUrl, testIds } from "../../constants";
+import { testIds } from "../../constants";
 import { getElementDOMRect } from "../../utils";
 
 test.describe("Timeline: Duration Input", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/');
+  });
+
   test("should gain focus on click", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
 
@@ -14,7 +17,6 @@ test.describe("Timeline: Duration Input", () => {
   });
 
   test("should not update value on typing", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
     const rulerDraggableArea = await timeline.getByTestId(
@@ -35,7 +37,6 @@ test.describe("Timeline: Duration Input", () => {
   });
 
   test("should update value on pressing Enter", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
     const rulerDraggableArea = await timeline.getByTestId(
@@ -61,7 +62,6 @@ test.describe("Timeline: Duration Input", () => {
   test("should update value on clicking anywhere outside input", async ({
     page
   }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
     const rulerDraggableArea = await timeline.getByTestId(
@@ -84,7 +84,6 @@ test.describe("Timeline: Duration Input", () => {
   });
 
   test("should update value on pressing Tab", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
     const rulerDraggableArea = await timeline.getByTestId(
@@ -109,7 +108,6 @@ test.describe("Timeline: Duration Input", () => {
   test("should update value on pressing native step button", async ({
     page
   }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
     const rulerDraggableArea = await timeline.getByTestId(
@@ -143,7 +141,6 @@ test.describe("Timeline: Duration Input", () => {
   });
 
   test("should set to previous value on pressing Escape", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
     const rulerDraggableArea = await timeline.getByTestId(
@@ -172,7 +169,6 @@ test.describe("Timeline: Duration Input", () => {
   });
 
   test("should remove any leading zeros", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
 
@@ -186,7 +182,6 @@ test.describe("Timeline: Duration Input", () => {
   test("should revert to previous valid value on invalid input", async ({
     page
   }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
 
@@ -203,7 +198,6 @@ test.describe("Timeline: Duration Input", () => {
   });
 
   test("should be between 100ms and 6000ms", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
 
@@ -219,7 +213,6 @@ test.describe("Timeline: Duration Input", () => {
   });
 
   test("should adjust value to be multiples of 10", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
 
@@ -233,7 +226,6 @@ test.describe("Timeline: Duration Input", () => {
   test("should update time input value if duration < time", async ({
     page
   }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const durationInput = await timeline.getByTestId(testIds.durationInput);

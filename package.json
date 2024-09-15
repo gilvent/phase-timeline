@@ -37,6 +37,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
+    "playwright:test": "npx playwright test",
+    "playwright:last-report": "npx playwright show-report",
     "eject": "react-scripts eject",
     "prepare": "husky"
   },

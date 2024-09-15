@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { pageUrl, testIds } from "../../constants";
+import { testIds } from "../../constants";
 import {
   getElementDOMRect,
   getElementScroll,
@@ -8,7 +8,7 @@ import {
 
 test.describe("Timeline: KeyframeList Interaction", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(pageUrl);
+    await page.goto('/');
   });
 
   test("segment length should visually represent duration (1px = 1ms duration)", async ({

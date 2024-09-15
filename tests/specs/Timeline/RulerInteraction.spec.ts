@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { pageUrl, testIds } from "../../constants";
+import { testIds } from "../../constants";
 import {
   getElementDOMRect,
   getElementScroll,
@@ -7,20 +7,9 @@ import {
 } from "../../utils";
 
 test.describe("Timeline: Ruler Interaction", () => {
-  async function expectPlayheadPositionEqualToMousePosition(
-    playheadX: number,
-    mouseX: number
-  ) {
-    const playheadXToMouseXDistance = Math.abs(playheadX - mouseX);
-    // In browser, it is possible that mouse position is not exactly the same as the playhead,
-    // therefore use the maxDiffPixels.
-    const maxDiffPixels = 1;
-
-    await expect(playheadXToMouseXDistance <= maxDiffPixels).toEqual(true);
-  }
 
   test.beforeEach(async ({ page }) => {
-    await page.goto(pageUrl);
+    await page.goto('/');
   });
 
   test("ruler length should visually represent duration (1px = 1ms duration)", async ({

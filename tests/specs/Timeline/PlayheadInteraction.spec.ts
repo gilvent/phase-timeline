@@ -7,7 +7,7 @@ import {
 
 test.describe("Timeline: Playhead Interaction", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(pageUrl);
+    await page.goto('/');
   });
 
   test("should maintain relative position when ruler is scrolled", async ({

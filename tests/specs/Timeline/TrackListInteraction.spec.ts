@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { pageUrl, testIds } from "../../constants";
+import { testIds } from "../../constants";
 import {
   getElementDOMRect,
   getElementScroll,
@@ -8,7 +8,7 @@ import {
 
 test.describe("Timeline: TrackList Interaction", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(pageUrl);
+    await page.goto('/');
   });
 
   test("should synchronize vertical scroll with KeyframeList", async ({
@@ -21,7 +21,6 @@ test.describe("Timeline: TrackList Interaction", () => {
     // vertical scroll on keyframe list
     await scrollVertical(keyframeList, 100);
     await page.waitForTimeout(200);
-
 
     const { scrollTop: trackListScrollTop } = await getElementScroll(trackList);
     const { scrollTop: keyframeListScrollTop } =

@@ -1,10 +1,13 @@
 import { test, expect } from "@playwright/test";
-import { pageUrl, testIds } from "../../constants";
+import { testIds } from "../../constants";
 import { getElementDOMRect } from "../../utils";
 
 test.describe("Timeline: Time Input", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto("/");
+  });
+
   test("should gain focus on click", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
 
@@ -14,7 +17,6 @@ test.describe("Timeline: Time Input", () => {
   });
 
   test("should not update time value on typing", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
@@ -31,7 +33,6 @@ test.describe("Timeline: Time Input", () => {
   });
 
   test("should update time value on pressing Enter", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
@@ -52,7 +53,6 @@ test.describe("Timeline: Time Input", () => {
   test("should update value on clicking anywhere outside input", async ({
     page
   }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
@@ -71,7 +71,6 @@ test.describe("Timeline: Time Input", () => {
   });
 
   test("should update value on pressing Tab", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
@@ -92,7 +91,6 @@ test.describe("Timeline: Time Input", () => {
   test("should update value on pressing native step button", async ({
     page
   }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
@@ -122,7 +120,6 @@ test.describe("Timeline: Time Input", () => {
   });
 
   test("should set to previous value on pressing Escape", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const playhead = await timeline.getByTestId(testIds.playhead);
@@ -147,7 +144,6 @@ test.describe("Timeline: Time Input", () => {
   });
 
   test("should remove any leading zeros", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
 
@@ -161,7 +157,6 @@ test.describe("Timeline: Time Input", () => {
   test("should revert to previous valid value on invalid input", async ({
     page
   }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
 
@@ -178,7 +173,6 @@ test.describe("Timeline: Time Input", () => {
   });
 
   test("should adjust value if lower than 0ms", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
 
@@ -190,7 +184,6 @@ test.describe("Timeline: Time Input", () => {
   });
 
   test("should adjust value if exceeding duration", async ({ page }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
     const duration = await timeline.getByTestId(testIds.durationInput);
@@ -209,7 +202,6 @@ test.describe("Timeline: Time Input", () => {
   test("should round decimal to nearest integer (round to nearest 10)", async ({
     page
   }) => {
-    await page.goto(pageUrl);
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
 
