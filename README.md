@@ -1,17 +1,18 @@
 # Phase Timeline Challenge
 Project is cloned from this [repo](https://github.com/phase-software/timeline-challenge).
 
-## Setup the project
-1. Run `npm install`
-
-
 ## Running the project
 
-1. Run `npm start`
+1. Run `npm install`
+
+2. Run `npm start`
 
 
 ## Testing
 This project use [Playwright](https://playwright.dev/docs/intro) to test behaviors on real browsers.
+
+### Setup
+1. Run `npx playwright install` and select `Y` when prompt to install browsers. This is required as Playwright use its own controlled browsers to run tests.
 
 ### Run tests
 1. Before running tests, make sure the project is run locally using `npm start`.
