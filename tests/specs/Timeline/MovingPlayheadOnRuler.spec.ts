@@ -3,11 +3,11 @@ import { testIds } from "../../constants";
 import { getElementDOMRect, scrollHorizontal } from "../../utils";
 
 test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
-  async function expectPlayheadPositionEqualToMousePosition(
+  async function expectPlayheadPositionToEqualX(
     playheadX: number,
-    mouseX: number
+    x: number
   ) {
-    const playheadXToMouseXDistance = Math.abs(playheadX - mouseX);
+    const playheadXToMouseXDistance = Math.abs(playheadX - x);
     // In browser, it is possible that mouse position is not exactly the same as the playhead,
     // therefore use the maxDiffPixels.
     const maxDiffPixels = 5;
@@ -34,7 +34,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     await page.mouse.click(clickX, rulerAreaY + 10);
 
     const { x: playheadX } = await getElementDOMRect(playhead);
-    await expectPlayheadPositionEqualToMousePosition(playheadX, clickX);
+    await expectPlayheadPositionToEqualX(playheadX, clickX);
   });
 
   test("should update time when clicking on ruler", async ({ page }) => {
@@ -97,7 +97,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
 
     const { x: playheadX } = await getElementDOMRect(playhead);
 
-    await expectPlayheadPositionEqualToMousePosition(
+    await expectPlayheadPositionToEqualX(
       playheadX,
       initialClickX + dragDistance
     );
@@ -124,7 +124,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
 
       const { x: playheadX } = await getElementDOMRect(playhead);
 
-      await expectPlayheadPositionEqualToMousePosition(playheadX, rulerAreaX);
+      await expectPlayheadPositionToEqualX(playheadX, rulerAreaX);
     });
 
     test("playhead should stay at right bounds when dragged across right bounds", async ({
@@ -157,7 +157,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
 
       const { x: playheadX } = await getElementDOMRect(playhead);
 
-      await expectPlayheadPositionEqualToMousePosition(
+      await expectPlayheadPositionToEqualX(
         playheadX,
         rulerAreaRight
       );
@@ -196,7 +196,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
 
       const { x: playheadX } = await getElementDOMRect(playhead);
 
-      await expectPlayheadPositionEqualToMousePosition(
+      await expectPlayheadPositionToEqualX(
         playheadX,
         rulerContainerRight
       );
@@ -223,24 +223,24 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
       const { y: rulerAreaY } =
         await getElementDOMRect(rulerBar);
 
-      const { x: rulerContainerX, left: rulerContainerLeft } =
+      const { x: rulerContainerX } =
         await getElementDOMRect(rulerContainer);
 
       // scroll the container
       await scrollHorizontal(rulerContainer, 300);
 
-      await page.mouse.click(rulerContainerX + 100, rulerAreaY + 10);
-
+      
       // dragged across left bounds
+      await page.mouse.move(rulerContainerX + 100, rulerAreaY + 10);
       await page.mouse.down();
       await page.mouse.move(rulerContainerX - 50, rulerAreaY + 10);
       await page.mouse.up();
 
       const { x: playheadX } = await getElementDOMRect(playhead);
 
-      await expectPlayheadPositionEqualToMousePosition(
+      await expectPlayheadPositionToEqualX(
         playheadX,
-        rulerContainerLeft
+        rulerContainerX
       );
     });
   });
