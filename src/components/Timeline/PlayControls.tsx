@@ -44,7 +44,7 @@ export const PlayControls = ({
         <NumberInput
           value={time}
           onChange={handleTimeInputChange}
-          dataTestId="time"
+          dataTestId="current-time-input"
           min={0}
           max={duration}
         />
@@ -53,7 +53,7 @@ export const PlayControls = ({
       <fieldset className="flex gap-1">
         <NumberInput
           value={duration}
-          dataTestId="max-time"
+          dataTestId="duration-input"
           min={100}
           max={6000}
           onChange={handleDurationInputChange}

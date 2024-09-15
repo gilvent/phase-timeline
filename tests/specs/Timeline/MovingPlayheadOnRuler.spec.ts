@@ -23,12 +23,12 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     page
   }) => {
     const timeline = await page.getByTestId(testIds.timeline);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const playhead = await timeline.getByTestId(testIds.playhead);
     const { x: rulerAreaX, y: rulerAreaY } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
     const clickX = rulerAreaX + 100;
 
     await page.mouse.click(clickX, rulerAreaY + 10);
@@ -40,11 +40,11 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
   test("should update time when clicking on ruler", async ({ page }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const { x: rulerAreaX, y: rulerAreaY } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
     const prevTime = await timeInput.inputValue();
 
     // clicking 100px away from the start of draggable area
@@ -57,11 +57,11 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
   test("should update time when dragging playhead", async ({ page }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const timeInput = await timeline.getByTestId(testIds.timeInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const { x: rulerAreaX, y: rulerAreaY } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
     const prevTime = await timeInput.inputValue();
     const clickX = rulerAreaX + 100;
     const dragDistance = 200;
@@ -81,12 +81,12 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     page
   }) => {
     const timeline = await page.getByTestId(testIds.timeline);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const playhead = await timeline.getByTestId(testIds.playhead);
     const { x: rulerAreaX, y: rulerAreaY } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
     const initialClickX = rulerAreaX + 100;
     const dragDistance = 200;
 
@@ -108,12 +108,12 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
       page
     }) => {
       const timeline = await page.getByTestId(testIds.timeline);
-      const rulerDraggableArea = await timeline.getByTestId(
-        testIds.rulerDraggableArea
+      const rulerBar = await timeline.getByTestId(
+        testIds.rulerBar
       );
       const playhead = await timeline.getByTestId(testIds.playhead);
       const { x: rulerAreaX, y: rulerAreaY } =
-        await getElementDOMRect(rulerDraggableArea);
+        await getElementDOMRect(rulerBar);
 
       await page.mouse.move(rulerAreaX + 100, rulerAreaY + 10);
       await page.mouse.down();
@@ -132,8 +132,8 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
     }) => {
       const timeline = await page.getByTestId(testIds.timeline);
       const durationInput = await page.getByTestId(testIds.durationInput);
-      const rulerDraggableArea = await timeline.getByTestId(
-        testIds.rulerDraggableArea
+      const rulerBar = await timeline.getByTestId(
+        testIds.rulerBar
       );
       const playhead = await timeline.getByTestId(testIds.playhead);
 
@@ -146,7 +146,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
         x: rulerAreaX,
         y: rulerAreaY,
         right: rulerAreaRight
-      } = await getElementDOMRect(rulerDraggableArea);
+      } = await getElementDOMRect(rulerBar);
 
       await page.mouse.move(rulerAreaX + 100, rulerAreaY + 10);
       await page.mouse.down();
@@ -171,8 +171,8 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
       const timeline = await page.getByTestId(testIds.timeline);
       const durationInput = await page.getByTestId(testIds.durationInput);
       const rulerContainer = await timeline.getByTestId(testIds.ruler);
-      const rulerDraggableArea = await timeline.getByTestId(
-        testIds.rulerDraggableArea
+      const rulerBar = await timeline.getByTestId(
+        testIds.rulerBar
       );
       const playhead = await timeline.getByTestId(testIds.playhead);
 
@@ -182,7 +182,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
       await page.keyboard.press("Enter");
 
       const { x: rulerAreaX, y: rulerAreaY } =
-        await getElementDOMRect(rulerDraggableArea);
+        await getElementDOMRect(rulerBar);
 
       const { right: rulerContainerRight } =
         await getElementDOMRect(rulerContainer);
@@ -210,8 +210,8 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
       const timeline = await page.getByTestId(testIds.timeline);
       const durationInput = await page.getByTestId(testIds.durationInput);
       const rulerContainer = await timeline.getByTestId(testIds.ruler);
-      const rulerDraggableArea = await timeline.getByTestId(
-        testIds.rulerDraggableArea
+      const rulerBar = await timeline.getByTestId(
+        testIds.rulerBar
       );
       const playhead = await timeline.getByTestId(testIds.playhead);
 
@@ -221,7 +221,7 @@ test.describe("Timeline: Moving Playhead On Ruler Interaction", () => {
       await page.keyboard.press("Enter");
 
       const { y: rulerAreaY } =
-        await getElementDOMRect(rulerDraggableArea);
+        await getElementDOMRect(rulerBar);
 
       const { x: rulerContainerX, left: rulerContainerLeft } =
         await getElementDOMRect(rulerContainer);

@@ -19,17 +19,17 @@ test.describe("Timeline: Duration Input", () => {
   test("should not update value on typing", async ({ page }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const { width: initialRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await durationInput.click();
     await page.keyboard.type("100");
 
     const { width: lastRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await expect(durationInput).toHaveValue("100");
     // same ruler drag area width means duration value is not updated
@@ -39,18 +39,18 @@ test.describe("Timeline: Duration Input", () => {
   test("should update value on pressing Enter", async ({ page }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const { width: initialRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await durationInput.click();
     await page.keyboard.type("100");
     await page.keyboard.press("Enter");
 
     const { width: lastRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await expect(durationInput).toHaveValue("100");
     await expect(durationInput).not.toBeFocused();
@@ -64,18 +64,18 @@ test.describe("Timeline: Duration Input", () => {
   }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const { width: initialRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await durationInput.click();
     await page.keyboard.type("200");
     await page.mouse.click(0, 0);
 
     const { width: lastRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await expect(durationInput).toHaveValue("200");
     await expect(durationInput).not.toBeFocused();
@@ -86,18 +86,18 @@ test.describe("Timeline: Duration Input", () => {
   test("should update value on pressing Tab", async ({ page }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const { width: initialRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await durationInput.click();
     await page.keyboard.type("100");
     await page.keyboard.press("Tab");
 
     const { width: lastRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await expect(durationInput).toHaveValue("100");
     await expect(durationInput).not.toBeFocused();
@@ -110,8 +110,8 @@ test.describe("Timeline: Duration Input", () => {
   }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
     const expectations = [
       { key: "ArrowUp", inputValue: "110" },
@@ -127,12 +127,12 @@ test.describe("Timeline: Duration Input", () => {
 
     for (const e of expectations) {
       const { width: initialRulerWidth } =
-        await getElementDOMRect(rulerDraggableArea);
+        await getElementDOMRect(rulerBar);
 
       await page.keyboard.press(e.key);
 
       const { width: lastRulerWidth } =
-        await getElementDOMRect(rulerDraggableArea);
+        await getElementDOMRect(rulerBar);
 
       await expect(durationInput).toHaveValue(e.inputValue);
       // changing ruler drag width means duration is updated
@@ -143,8 +143,8 @@ test.describe("Timeline: Duration Input", () => {
   test("should set to previous value on pressing Escape", async ({ page }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
 
     await durationInput.click();
@@ -153,14 +153,14 @@ test.describe("Timeline: Duration Input", () => {
     await page.keyboard.press("Enter");
 
     const { width: initialRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await durationInput.click();
     await page.keyboard.type("130");
     await page.keyboard.press("Escape");
 
     const { width: lastRulerWidth } =
-      await getElementDOMRect(rulerDraggableArea);
+      await getElementDOMRect(rulerBar);
 
     await expect(durationInput).toHaveValue("100");
     await expect(durationInput).not.toBeFocused();

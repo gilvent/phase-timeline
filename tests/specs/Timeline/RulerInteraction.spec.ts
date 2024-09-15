@@ -17,10 +17,10 @@ test.describe("Timeline: Ruler Interaction", () => {
   }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
-    const { width } = await getElementDOMRect(rulerDraggableArea);
+    const { width } = await getElementDOMRect(rulerBar);
     const duration = await durationInput.inputValue();
 
     await expect(width).toEqual(parseInt(duration));
@@ -31,15 +31,15 @@ test.describe("Timeline: Ruler Interaction", () => {
   }) => {
     const timeline = await page.getByTestId(testIds.timeline);
     const durationInput = await timeline.getByTestId(testIds.durationInput);
-    const rulerDraggableArea = await timeline.getByTestId(
-      testIds.rulerDraggableArea
+    const rulerBar = await timeline.getByTestId(
+      testIds.rulerBar
     );
 
     await durationInput.click();
     await page.keyboard.type("1000");
     await page.mouse.click(0, 0);
 
-    const { width } = await getElementDOMRect(rulerDraggableArea);
+    const { width } = await getElementDOMRect(rulerBar);
     const duration = await durationInput.inputValue();
 
     await expect(width).toEqual(parseInt(duration));

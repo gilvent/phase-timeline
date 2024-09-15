@@ -1,10 +1,10 @@
 export const testIds = {
   timeline: "timeline",
-  timeInput: "time",
-  durationInput: "max-time",
+  timeInput: "current-time-input",
+  durationInput: "duration-input",
   playhead: "playhead",
   ruler: "ruler",
-  rulerDraggableArea: "ruler-draggable-area",
+  rulerBar: "ruler-bar",
   keyframeList: "keyframe-list",
   trackList: "track-list",
   segment: "segment"

@@ -182,7 +182,7 @@ export const Ruler = ({
       data-testid="ruler"
     >
       <div
-        data-testid="ruler-draggable-area"
+        data-testid="ruler-bar"
         ref={draggableAreaRef}
         className="w-[2000px] h-6 rounded-md bg-white/25"
         onMouseDown={handleMouseDown}
